@@ -1,15 +1,18 @@
-import streamlit as st
 import pickle
+import streamlit as st
 import pandas as pd
 
-# Charger le modèle sauvegardé
-@st.cache  # Utilisation du cache pour éviter de recharger le modèle à chaque fois
+# Charger le modèle sauvegardé avec le nouveau cache
+@st.cache_data
 def load_model():
-    model = pickle.load(open("car_price_gbr.pkl", "rb"))
-    return model
+    # Charger le modèle depuis le fichier .pkl
+    return pickle.load(open("car_price_gbr.pkl", "rb"))
 
 # Charger le modèle
 model_regression = load_model()
+
+# Afficher une confirmation
+st.write("Modèle chargé avec succès!")
 
 # Titre de l'application
 st.title("Prédiction du prix d'une voiture")
