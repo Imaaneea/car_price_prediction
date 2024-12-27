@@ -2,8 +2,10 @@ import streamlit as st
 import pickle
 import pandas as pd
 
-# Charger le modèle enregistré
-model_regression = pickle.load(open("car_price_gbr.pkl", mode = "rb"))
+import os
+
+# Charger le modèle en utilisant le chemin absolu
+model_regression = pickle.load(open(os.path.join(os.getcwd(), "car_price_gbr.pkl"), mode="rb"))
 
 # Interface Streamlit
 st.title("Prédiction du prix d'une voiture")
