@@ -3,7 +3,7 @@ import pickle
 import pandas as pd
 
 # Charger le modèle enregistré
-model_regression = pickle.load(open("car_price_gbr.pkl", mode="rb"))
+model_regression = pickle.load(open("car_price_gbr.pkl", mode = "rb"))
 
 # Interface Streamlit
 st.title("Prédiction du prix d'une voiture")
