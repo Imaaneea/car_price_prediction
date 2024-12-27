@@ -2,30 +2,35 @@ import streamlit as st
 import pickle
 import pandas as pd
 
-import os
+# Charger le modèle sauvegardé
+@st.cache  # Utilisation du cache pour éviter de recharger le modèle à chaque fois
+def load_model():
+    model = pickle.load(open("car_price_gbr.pkl", "rb"))
+    return model
 
-# Charger le modèle en utilisant le chemin absolu
-model_regression = pickle.load(open(os.path.join(os.getcwd(), "car_price_gbr.pkl"), mode="rb"))
+# Charger le modèle
+model_regression = load_model()
 
-# Interface Streamlit
+# Titre de l'application
 st.title("Prédiction du prix d'une voiture")
-seller = st.selectbox("Type de vendeur", ['private', 'dealer'])
-offer_type = st.selectbox("Type d'offre", ['offer', 'wanted'])
-abtest = st.selectbox("A/B Test", ['control', 'treatment'])
-vehicle_type = st.selectbox("Type de véhicule", ['sedan', 'suv', 'coupe', 'convertible', 'hatchback'])
-year_of_registration = st.number_input("Année d'enregistrement", min_value=1900, max_value=2024)
-gearbox = st.selectbox("Boîte de vitesse", ['manual', 'automatic'])
-power_ps = st.number_input("Puissance (PS)", min_value=0, max_value=1000)
-model = st.text_input("Modèle")
-kilometer = st.number_input("Kilomètres", min_value=0, max_value=500000)
-fuel_type = st.selectbox("Type de carburant", ['petrol', 'diesel', 'electric', 'lpg'])
-brand = st.text_input("Marque")
-not_repaired_damage = st.selectbox("Dommages non réparés", ['no', 'yes'])
-age = st.number_input("Âge du véhicule", min_value=0, max_value=50)
 
-# Créer un dataframe pour la prédiction
-data_unseen = pd.DataFrame({
-    'index': [1],
+# Ajouter des champs pour les entrées utilisateur
+seller = st.selectbox("Vendeur", ["private", "dealer"])
+offer_type = st.selectbox("Type d'offre", ["offer", "request"])
+abtest = st.selectbox("AB Test", ["control", "treatment"])
+vehicle_type = st.selectbox("Type de véhicule", ["sedan", "coupe", "hatchback", "convertible", "wagon", "bus", "van"])
+year_of_registration = st.number_input("Année d'enregistrement", min_value=1900, max_value=2024, value=2015)
+gearbox = st.selectbox("Boîte de vitesses", ["manual", "automatic"])
+power_ps = st.number_input("Puissance en PS", min_value=1, max_value=1000, value=120)
+model = st.text_input("Modèle", "Golf")
+kilometer = st.number_input("Kilométrage", min_value=0, max_value=500000, value=150000)
+fuel_type = st.selectbox("Type de carburant", ["petrol", "diesel", "lpg", "cng", "hybrid", "electric"])
+brand = st.text_input("Marque", "Volkswagen")
+not_repaired_damage = st.selectbox("Dommages non réparés", ["no", "yes"])
+age = st.number_input("Âge de la voiture", min_value=0, max_value=100, value=8)
+
+# Créer un DataFrame avec les données de l'utilisateur
+user_data = pd.DataFrame({
     'seller': [seller],
     'offerType': [offer_type],
     'abtest': [abtest],
@@ -41,6 +46,7 @@ data_unseen = pd.DataFrame({
     'age': [age]
 })
 
-# Faire une prédiction
-prediction = model_regression.predict(data_unseen)
-st.write(f"Prix prédit : {prediction[0]:.2f} €")
+# Faire la prédiction
+if st.button("Prédire le prix"):
+    prediction = model_regression.predict(user_data)
+    st.write(f"Prix prédit : {prediction[0]:.2f} EUR")
