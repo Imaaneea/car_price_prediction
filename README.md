@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 ### Étape 3 : Sauvegarder le fichier `README.md`
 
@@ -15,3 +16,23 @@ Une fois que ton fichier `README.md` est prêt, tu peux l'ajouter à ton dépôt
 
    ```bash
    git add README.md
+=======
+# Car Price Prediction App
+
+Cette application prédit le prix d'une voiture d'occasion en fonction de certaines caractéristiques (marque, modèle, année d'enregistrement, etc.) en utilisant un modèle de régression.
+
+## Prérequis
+
+- Python 3.x
+- Streamlit
+- scikit-learn
+- pandas
+
+## Installation
+
+1. Clonez le dépôt :
+
+   ```bash
+   git clone https://github.com/Imaaneea/car_price_prediction.git
+   cd car_price_prediction
+>>>>>>> 54de93099c6ad0363d5c0d46bb578526fe7c9fcd

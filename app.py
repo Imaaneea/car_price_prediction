@@ -3,7 +3,11 @@ import pickle
 import pandas as pd
 
 # Charger le pipeline sauvegardé
+<<<<<<< HEAD
 pipeline = pickle.load(open("car_price_rf.pkl", mode="rb"))
+=======
+pipeline = pickle.load(open("car_price_gbr.pkl", mode="rb"))
+>>>>>>> 54de93099c6ad0363d5c0d46bb578526fe7c9fcd
 
 # Titre de l'application
 st.title("Prédiction du Prix des Voitures 🚗")
@@ -45,4 +49,8 @@ if st.button("Prédire le prix"):
     else:
         # Prédire avec le pipeline
         prediction = pipeline.predict(input_data)[0]
+<<<<<<< HEAD
         st.success(f"Le prix estimé du véhicule est : {prediction:.2f} unités monétaires")
+=======
+        st.success(f"Le prix estimé du véhicule est : {prediction:.2f} unités monétaires")
+>>>>>>> 54de93099c6ad0363d5c0d46bb578526fe7c9fcd
