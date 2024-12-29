@@ -3,7 +3,7 @@ import pickle
 import pandas as pd
 
 # Charger le pipeline sauvegardé
-pipeline = pickle.load(open("car_price_rf.pkl", mode="rb"))
+pipeline = pickle.load(open("car_price_gbr.pkl", mode="rb"))
 
 # Titre de l'application
 st.title("Prédiction du Prix des Voitures 🚗")
