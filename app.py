@@ -1,34 +1,71 @@
 import os
-import streamlit as st
 import pickle
 import pandas as pd
 import requests
+import streamlit as st
+from sklearn.pipeline import Pipeline
+from sklearn.impute import SimpleImputer
+from sklearn.ensemble import RandomForestRegressor
 
-# URL directe pour télécharger le fichier modèle depuis GitHub
-file_url = "https://github.com/Imaaneea/car_price_prediction/raw/refs/heads/master/car_price_rf.pkl"
+# URL pour télécharger le fichier modèle depuis GitHub
+file_url = "https://github.com/Imaaneea/your-repo/raw/refs/heads/master/car_price_rf.pkl"  # Remplacez par l'URL correcte
 
 # Titre de l'application
-st.title("Prédiction du Prix des Voitures 🚗")
+st.write("""
+# MSDE5 : ML Project
+## Car Price Prediction App
 
-# Afficher le répertoire courant
-st.write(f"Répertoire courant : {os.getcwd()}")
+This app predicts the **Car Price** using a machine learning model.
+""")
+
+# Afficher une image du projet dans la barre latérale
+st.sidebar.image("https://miro.medium.com/v2/resize:fit:1370/1*yjQ2safdygCd9y4HbA48oA.png", width=300)
+st.sidebar.header('User Input Parameters')
+
+# Définir les paramètres d'entrée pour la prédiction
+def user_input_features():
+    vehicleType = st.sidebar.selectbox('Vehicle Type', ['car', 'suv', 'van', 'coupe', 'wagon', 'convertible', 'bus'])
+    yearOfRegistration = st.sidebar.slider('Year of Registration', 2000, 2024, 2015)
+    gearbox = st.sidebar.selectbox('Gearbox', ['manual', 'automatic'])
+    powerPS = st.sidebar.slider('Power (in PS)', 50, 500, 100)
+    model = st.sidebar.text_input('Model', 'Focus')
+    kilometer = st.sidebar.slider('Mileage (in km)', 0, 300000, 50000)
+    fuelType = st.sidebar.selectbox('Fuel Type', ['petrol', 'diesel', 'lpg', 'cng', 'electric', 'hybrid'])
+    brand = st.sidebar.selectbox('Brand', ['Ford', 'Chevrolet', 'Toyota', 'Honda', 'BMW', 'Audi'])
+    notRepairedDamage = st.sidebar.selectbox('Not Repaired Damage', ['yes', 'no'])
+    age = st.sidebar.slider('Age of the Vehicle', 0, 30, 5)
+    
+    data = {
+        'vehicleType': vehicleType,
+        'yearOfRegistration': yearOfRegistration,
+        'gearbox': gearbox,
+        'powerPS': powerPS,
+        'model': model,
+        'kilometer': kilometer,
+        'fuelType': fuelType,
+        'brand': brand,
+        'notRepairedDamage': notRepairedDamage,
+        'age': age
+    }
+    
+    features = pd.DataFrame(data, index=[0])
+    return features
+
+# Obtenir les entrées utilisateur
+df = user_input_features()
+
+# Afficher les paramètres d'entrée
+st.subheader('User Input Parameters')
+st.write(df)
 
 # Chemin local du fichier modèle
 file_path = os.path.join(os.getcwd(), "car_price_rf.pkl")
-st.write(f"Vérification du fichier à l'emplacement : {file_path}")
 
-# Fonction pour nettoyer les entrées texte et gérer les problèmes d'encodage
-def clean_input(input_string):
-    if isinstance(input_string, str):
-        return input_string.encode("utf-8", errors="ignore").decode("utf-8")
-    return input_string
-
-# Télécharger ou charger le modèle
+# Charger ou télécharger le modèle
 try:
+    # Si le modèle n'existe pas localement, le télécharger
     if not os.path.exists(file_path):
-        # Utiliser st.spinner() pour afficher un message de chargement sans exposer d'autres informations
         with st.spinner("Téléchargement du modèle, veuillez patienter..."):
-            # Télécharger le fichier depuis GitHub
             response = requests.get(file_url, stream=True)
             if response.status_code == 200:
                 with open(file_path, mode="wb") as model_file:
@@ -38,51 +75,17 @@ try:
                 st.stop()
 
     # Charger le modèle depuis le fichier local
-    with open(file_path, mode="rb") as model_file:
-        pipeline = pickle.load(model_file)
+    with open(file_path, 'rb') as file:
+        model = pickle.load(file)
     st.success("Le modèle a été chargé avec succès.")
 except Exception as e:
     st.error(f"Erreur lors du chargement ou du téléchargement du modèle : {e}")
     st.stop()
 
-# Description de l'application
-st.write("Cette application utilise un modèle Random Forest pour estimer le prix des voitures d'occasion.")
-
-# Entrées utilisateur
-st.header("Entrez les caractéristiques du véhicule :")
-vehicle_type = st.selectbox("Type de véhicule", ["", "Limousine", "Cabriolet", "SUV", "Compact", "Van"])
-year_of_registration = st.number_input("Année d'enregistrement", min_value=1900, max_value=2024, value=2015)
-gearbox = st.selectbox("Type de boîte de vitesses", ["", "Manual", "Automatic"])
-power_ps = st.number_input("Puissance (PS)", min_value=0, max_value=1000, value=100)
-model = clean_input(st.text_input("Modèle (ex. Golf, Polo, etc.)"))
-kilometer = st.number_input("Kilométrage (en km)", min_value=0, max_value=500000, value=50000)
-fuel_type = st.selectbox("Type de carburant", ["", "Petrol", "Diesel", "Electric", "CNG", "LPG"])
-brand = clean_input(st.text_input("Marque (ex. BMW, Audi, etc.)"))
-not_repaired_damage = st.selectbox("Réparé ?", ["", "Yes", "No"])
-age = 2024 - year_of_registration  # Calculer l'âge à partir de l'année d'enregistrement
-
-# Préparer les données pour la prédiction
-if st.button("Prédire le prix"):
-    input_data = pd.DataFrame({
-        "vehicleType": [vehicle_type],
-        "yearOfRegistration": [year_of_registration],
-        "gearbox": [gearbox],
-        "powerPS": [power_ps],
-        "model": [model],
-        "kilometer": [kilometer],
-        "fuelType": [fuel_type],
-        "brand": [brand],
-        "notRepairedDamage": [not_repaired_damage],
-        "age": [age]
-    })
-
-    # Vérifier si tous les champs sont remplis
-    if input_data.isnull().any().any() or "" in input_data.values:
-        st.error("Veuillez remplir tous les champs avant de prédire.")
-    else:
-        try:
-            # Prédire avec le modèle chargé
-            prediction = pipeline.predict(input_data)[0]
-            st.success(f"Le prix estimé du véhicule est : {prediction:.2f} unités monétaires")
-        except Exception as e:
-            st.error(f"Erreur lors de la prédiction : {e}")
+# Prédire le prix de la voiture lorsque l'utilisateur appuie sur le bouton
+if st.sidebar.button('Predict Price'):
+    try:
+        prediction = model.predict(df)
+        st.write(f'Predicted Price: ${prediction[0]:,.2f}')
+    except Exception as e:
+        st.error(f"Erreur lors de la prédiction : {e}")
