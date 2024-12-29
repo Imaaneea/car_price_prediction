@@ -26,17 +26,16 @@ def clean_input(input_string):
 # Télécharger ou charger le modèle
 try:
     if not os.path.exists(file_path):
-        st.warning(f"Le fichier modèle n'existe pas localement. Téléchargement depuis l'URL : {file_url}")
-        
-        # Télécharger le fichier depuis GitHub
-        response = requests.get(file_url, stream=True)
-        if response.status_code == 200:
-            with open(file_path, mode="wb") as model_file:
-                model_file.write(response.content)
-            st.success("Le fichier modèle a été téléchargé avec succès.")
-        else:
-            st.error(f"Échec du téléchargement. Code de réponse : {response.status_code}")
-            st.stop()
+        # Utiliser st.spinner() pour afficher un message de chargement sans exposer d'autres informations
+        with st.spinner("Téléchargement du modèle, veuillez patienter..."):
+            # Télécharger le fichier depuis GitHub
+            response = requests.get(file_url, stream=True)
+            if response.status_code == 200:
+                with open(file_path, mode="wb") as model_file:
+                    model_file.write(response.content)
+            else:
+                st.error(f"Échec du téléchargement. Code de réponse : {response.status_code}")
+                st.stop()
 
     # Charger le modèle depuis le fichier local
     with open(file_path, mode="rb") as model_file:
