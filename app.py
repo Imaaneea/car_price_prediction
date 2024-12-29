@@ -1,11 +1,13 @@
 import streamlit as st
 import pickle
 import pandas as pd
+import os  # Importation de os
+
+# Vérifier les fichiers dans le répertoire de travail
+st.write(os.listdir())  # Affiche les fichiers dans le répertoire de travail
 
 # Charger le pipeline sauvegardé
-
 pipeline = pickle.load(open("car_price_rf.pkl", mode="rb"))
-
 
 # Titre de l'application
 st.title("Prédiction du Prix des Voitures 🚗")
