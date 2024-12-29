@@ -2,31 +2,45 @@ import os
 import streamlit as st
 import pickle
 import pandas as pd
+import requests
 
-# Afficher le répertoire courant
-st.write(f"Répertoire courant : {os.getcwd()}")  # Cela vous indiquera où l'application est exécutée
-
-# Vérifier si le fichier du modèle existe
-file_path = os.path.join(os.getcwd(), "car_price_rf.pkl")  # Crée le chemin absolu vers le fichier
-st.write(f"Vérification du fichier à l'emplacement : {file_path}")
-
-# Charger le pipeline sauvegardé
-try:
-    # Vérifier si le fichier existe avant de le charger
-    if not os.path.exists(file_path):
-        st.error(f"Le fichier {file_path} n'existe pas. Veuillez vérifier le chemin et l'emplacement du fichier.")
-    else:
-        # Charger le modèle
-        with open(file_path, mode="rb") as model_file:
-            pipeline = pickle.load(model_file)
-        st.write("Le modèle a été chargé avec succès.")
-except Exception as e:
-    st.error(f"Erreur lors du chargement du modèle : {e}")
+# URL directe pour télécharger le fichier modèle depuis GitHub
+file_url = "https://github.com/Imaaneea/car_price_prediction/raw/refs/heads/master/car_price_rf.pkl"
 
 # Titre de l'application
 st.title("Prédiction du Prix des Voitures 🚗")
 
-# Description
+# Afficher le répertoire courant
+st.write(f"Répertoire courant : {os.getcwd()}")
+
+# Chemin local du fichier modèle
+file_path = os.path.join(os.getcwd(), "car_price_rf.pkl")
+st.write(f"Vérification du fichier à l'emplacement : {file_path}")
+
+# Télécharger ou charger le modèle
+try:
+    if not os.path.exists(file_path):
+        st.warning(f"Le fichier modèle n'existe pas localement. Téléchargement depuis l'URL : {file_url}")
+        
+        # Télécharger le fichier depuis GitHub
+        response = requests.get(file_url, stream=True)
+        if response.status_code == 200:
+            with open(file_path, mode="wb") as model_file:
+                model_file.write(response.content)
+            st.success("Le fichier modèle a été téléchargé avec succès.")
+        else:
+            st.error(f"Échec du téléchargement. Code de réponse : {response.status_code}")
+            st.stop()
+
+    # Charger le modèle depuis le fichier local
+    with open(file_path, mode="rb") as model_file:
+        pipeline = pickle.load(model_file)
+    st.success("Le modèle a été chargé avec succès.")
+except Exception as e:
+    st.error(f"Erreur lors du chargement ou du téléchargement du modèle : {e}")
+    st.stop()
+
+# Description de l'application
 st.write("Cette application utilise un modèle Random Forest pour estimer le prix des voitures d'occasion.")
 
 # Entrées utilisateur
