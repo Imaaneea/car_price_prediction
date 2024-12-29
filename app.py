@@ -1,55 +1,48 @@
-import pickle
 import streamlit as st
+import pickle
 import pandas as pd
 
-# Charger le modèle sauvegardé avec le nouveau cache
-@st.cache_data
-def load_model():
-    # Charger le modèle depuis le fichier .pkl
-    return pickle.load(open("car_price_gbr.pkl", "rb"))
-
-# Charger le modèle
-model_regression = load_model()
-
-# Afficher une confirmation
-st.write("Modèle chargé avec succès!")
+# Charger le pipeline sauvegardé
+pipeline = pickle.load(open("car_price_rf.pkl", mode="rb"))
 
 # Titre de l'application
-st.title("Prédiction du prix d'une voiture")
+st.title("Prédiction du Prix des Voitures 🚗")
 
-# Ajouter des champs pour les entrées utilisateur
-seller = st.selectbox("Vendeur", ["private", "dealer"])
-offer_type = st.selectbox("Type d'offre", ["offer", "request"])
-abtest = st.selectbox("AB Test", ["control", "treatment"])
-vehicle_type = st.selectbox("Type de véhicule", ["sedan", "coupe", "hatchback", "convertible", "wagon", "bus", "van"])
+# Description
+st.write("Cette application utilise un modèle Random Forest pour estimer le prix des voitures d'occasion.")
+
+# Entrées utilisateur
+st.header("Entrez les caractéristiques du véhicule :")
+vehicle_type = st.selectbox("Type de véhicule", ["", "Limousine", "Cabriolet", "SUV", "Compact", "Van"])
 year_of_registration = st.number_input("Année d'enregistrement", min_value=1900, max_value=2024, value=2015)
-gearbox = st.selectbox("Boîte de vitesses", ["manual", "automatic"])
-power_ps = st.number_input("Puissance en PS", min_value=1, max_value=1000, value=120)
-model = st.text_input("Modèle", "Golf")
-kilometer = st.number_input("Kilométrage", min_value=0, max_value=500000, value=150000)
-fuel_type = st.selectbox("Type de carburant", ["petrol", "diesel", "lpg", "cng", "hybrid", "electric"])
-brand = st.text_input("Marque", "Volkswagen")
-not_repaired_damage = st.selectbox("Dommages non réparés", ["no", "yes"])
-age = st.number_input("Âge de la voiture", min_value=0, max_value=100, value=8)
+gearbox = st.selectbox("Type de boîte de vitesses", ["", "Manual", "Automatic"])
+power_ps = st.number_input("Puissance (PS)", min_value=0, max_value=1000, value=100)
+model = st.text_input("Modèle (ex. Golf, Polo, etc.)")
+kilometer = st.number_input("Kilométrage (en km)", min_value=0, max_value=500000, value=50000)
+fuel_type = st.selectbox("Type de carburant", ["", "Petrol", "Diesel", "Electric", "CNG", "LPG"])
+brand = st.text_input("Marque (ex. BMW, Audi, etc.)")
+not_repaired_damage = st.selectbox("Réparé ?", ["", "Yes", "No"])
+age = 2024 - year_of_registration  # Calculer l'âge à partir de l'année d'enregistrement
 
-# Créer un DataFrame avec les données de l'utilisateur
-user_data = pd.DataFrame({
-    'seller': [seller],
-    'offerType': [offer_type],
-    'abtest': [abtest],
-    'vehicleType': [vehicle_type],
-    'yearOfRegistration': [year_of_registration],
-    'gearbox': [gearbox],
-    'powerPS': [power_ps],
-    'model': [model],
-    'kilometer': [kilometer],
-    'fuelType': [fuel_type],
-    'brand': [brand],
-    'notRepairedDamage': [not_repaired_damage],
-    'age': [age]
-})
-
-# Faire la prédiction
+# Préparer les données pour la prédiction
 if st.button("Prédire le prix"):
-    prediction = model_regression.predict(user_data)
-    st.write(f"Prix prédit : {prediction[0]:.2f} EUR")
+    input_data = pd.DataFrame({
+        "vehicleType": [vehicle_type],
+        "yearOfRegistration": [year_of_registration],
+        "gearbox": [gearbox],
+        "powerPS": [power_ps],
+        "model": [model],
+        "kilometer": [kilometer],
+        "fuelType": [fuel_type],
+        "brand": [brand],
+        "notRepairedDamage": [not_repaired_damage],
+        "age": [age]
+    })
+
+    # Vérifier si tous les champs sont remplis
+    if input_data.isnull().any().any() or "" in input_data.values:
+        st.error("Veuillez remplir tous les champs avant de prédire.")
+    else:
+        # Prédire avec le pipeline
+        prediction = pipeline.predict(input_data)[0]
+        st.success(f"Le prix estimé du véhicule est : {prediction:.2f} unités monétaires")
