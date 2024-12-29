@@ -54,4 +54,3 @@ if st.button("Prédire le prix"):
         # Prédire avec le pipeline
         prediction = pipeline.predict(input_data)[0]
         st.success(f"Le prix estimé du véhicule est : {prediction:.2f} unités monétaires")
-`
