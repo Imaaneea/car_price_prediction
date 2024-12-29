@@ -19,7 +19,7 @@ This app predicts the **Car Price** using a machine learning model.
 """)
 
 # Afficher une image du projet dans la barre latérale
-st.sidebar.image("https://miro.medium.com/v2/resize:fit:1370/1*yjQ2safdygCd9y4HbA48oA.png", width=300)
+st.sidebar.image("https://brandinside.asia/wp-content/uploads/2018/07/shutterstock_789304993-e1531737994674.jpg", width=300)
 st.sidebar.header('User Input Parameters')
 
 # Définir les paramètres d'entrée pour la prédiction
