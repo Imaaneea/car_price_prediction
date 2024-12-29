@@ -17,6 +17,12 @@ st.write(f"Répertoire courant : {os.getcwd()}")
 file_path = os.path.join(os.getcwd(), "car_price_rf.pkl")
 st.write(f"Vérification du fichier à l'emplacement : {file_path}")
 
+# Fonction pour nettoyer les entrées texte et gérer les problèmes d'encodage
+def clean_input(input_string):
+    if isinstance(input_string, str):
+        return input_string.encode("utf-8", errors="ignore").decode("utf-8")
+    return input_string
+
 # Télécharger ou charger le modèle
 try:
     if not os.path.exists(file_path):
@@ -49,10 +55,10 @@ vehicle_type = st.selectbox("Type de véhicule", ["", "Limousine", "Cabriolet", 
 year_of_registration = st.number_input("Année d'enregistrement", min_value=1900, max_value=2024, value=2015)
 gearbox = st.selectbox("Type de boîte de vitesses", ["", "Manual", "Automatic"])
 power_ps = st.number_input("Puissance (PS)", min_value=0, max_value=1000, value=100)
-model = st.text_input("Modèle (ex. Golf, Polo, etc.)")
+model = clean_input(st.text_input("Modèle (ex. Golf, Polo, etc.)"))
 kilometer = st.number_input("Kilométrage (en km)", min_value=0, max_value=500000, value=50000)
 fuel_type = st.selectbox("Type de carburant", ["", "Petrol", "Diesel", "Electric", "CNG", "LPG"])
-brand = st.text_input("Marque (ex. BMW, Audi, etc.)")
+brand = clean_input(st.text_input("Marque (ex. BMW, Audi, etc.)"))
 not_repaired_damage = st.selectbox("Réparé ?", ["", "Yes", "No"])
 age = 2024 - year_of_registration  # Calculer l'âge à partir de l'année d'enregistrement
 
