@@ -1,15 +1,25 @@
+import os
 import streamlit as st
 import pickle
 import pandas as pd
-import os
 
-# Définir le chemin du fichier modèle
-file_path = os.path.join(os.getcwd(), "car_price_rf.pkl")
+# Afficher le répertoire courant
+st.write(f"Répertoire courant : {os.getcwd()}")  # Cela vous indiquera où l'application est exécutée
+
+# Vérifier si le fichier du modèle existe
+file_path = os.path.join(os.getcwd(), "car_price_rf.pkl")  # Crée le chemin absolu vers le fichier
+st.write(f"Vérification du fichier à l'emplacement : {file_path}")
 
 # Charger le pipeline sauvegardé
 try:
-    pipeline = pickle.load(open(file_path, mode="rb"))
-    st.write("Le modèle a été chargé avec succès.")
+    # Vérifier si le fichier existe avant de le charger
+    if not os.path.exists(file_path):
+        st.error(f"Le fichier {file_path} n'existe pas. Veuillez vérifier le chemin et l'emplacement du fichier.")
+    else:
+        # Charger le modèle
+        with open(file_path, mode="rb") as model_file:
+            pipeline = pickle.load(model_file)
+        st.write("Le modèle a été chargé avec succès.")
 except Exception as e:
     st.error(f"Erreur lors du chargement du modèle : {e}")
 
@@ -51,12 +61,9 @@ if st.button("Prédire le prix"):
     if input_data.isnull().any().any() or "" in input_data.values:
         st.error("Veuillez remplir tous les champs avant de prédire.")
     else:
-        # Vérifier que le modèle est bien chargé avant de prédire
-        if 'pipeline' in locals():
-            try:
-                prediction = pipeline.predict(input_data)[0]
-                st.success(f"Le prix estimé du véhicule est : {prediction:.2f} unités monétaires")
-            except Exception as e:
-                st.error(f"Erreur lors de la prédiction : {e}")
-        else:
-            st.error("Le modèle n'a pas pu être chargé.")
+        try:
+            # Prédire avec le modèle chargé
+            prediction = pipeline.predict(input_data)[0]
+            st.success(f"Le prix estimé du véhicule est : {prediction:.2f} unités monétaires")
+        except Exception as e:
+            st.error(f"Erreur lors de la prédiction : {e}")
