@@ -2,4 +2,4 @@ streamlit
 pandas
 scikit-learn
 pickle-mixin
-pycaret==2.3.6
+pycaret==3.3.2
