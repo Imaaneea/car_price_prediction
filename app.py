@@ -1,13 +1,17 @@
 import streamlit as st
 import pickle
 import pandas as pd
-import os  # Importation de os
+import os  # Importer os pour manipuler les chemins de fichiers
 
-# Vérifier les fichiers dans le répertoire de travail
-st.write(os.listdir())  # Affiche les fichiers dans le répertoire de travail
+# Définir le chemin du fichier modèle de manière absolue
+file_path = os.path.join(os.getcwd(), "car_price_rf.pkl")
 
 # Charger le pipeline sauvegardé
-pipeline = pickle.load(open("car_price_rf.pkl", mode="rb"))
+try:
+    pipeline = pickle.load(open(file_path, mode="rb"))
+    st.write("Le modèle a été chargé avec succès.")
+except Exception as e:
+    st.error(f"Erreur lors du chargement du modèle : {e}")
 
 # Titre de l'application
 st.title("Prédiction du Prix des Voitures 🚗")
@@ -50,3 +54,4 @@ if st.button("Prédire le prix"):
         # Prédire avec le pipeline
         prediction = pipeline.predict(input_data)[0]
         st.success(f"Le prix estimé du véhicule est : {prediction:.2f} unités monétaires")
+`
