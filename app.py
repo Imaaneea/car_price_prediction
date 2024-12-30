@@ -8,7 +8,7 @@ from sklearn.impute import SimpleImputer
 from sklearn.ensemble import RandomForestRegressor
 
 # URL pour télécharger le fichier modèle depuis GitHub
-file_url = "https://github.com/Imaaneea/your-repo/raw/refs/heads/master/car_price_rf.pkl"  # Remplacez par l'URL correcte
+file_url = "https://github.com/Imaaneea/car_price_prediction/raw/refs/heads/master/car_price_rf.pkl?download="  # Remplacez par l'URL correcte
 
 # Titre de l'application
 st.write("""
